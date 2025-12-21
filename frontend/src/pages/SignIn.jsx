@@ -9,7 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, ArrowRight, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthProvider";
-import axios from "../api/axios";
+import api, { setAccessToken } from "@/api/axios";
+
 // ✅ Zod validation schema
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -39,7 +40,7 @@ const onSubmit = async (data) => {
   try {
     setErrorMsg("");
 
-    const response = await axios.post("/api/auth/login", data, {
+    const response = await api.post("/auth/login", data, {
       withCredentials: true,
     });
 
@@ -48,6 +49,8 @@ const onSubmit = async (data) => {
     const role = response?.data?.role;
 
     setAuth({ user, accessToken, role });
+
+    setAccessToken(response.data.accessToken);
 
     console.log("✅ Login Successful:", user);
     alert("Sign-in successful!");

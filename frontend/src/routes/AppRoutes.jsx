@@ -18,6 +18,8 @@ import FamousHandicrafts from "../pages/Handicrafts";
 import InfoSection from "../pages/InfoSection";
 import Register from "@/pages/Register";
 import SignIn from "@/pages/SignIn";
+import ProtectedRoute from "./ProtectedRoute";
+import Dashboard from "../pages/Dashboard";
 
 export default function AppRoutes() {
   return (
@@ -29,13 +31,17 @@ export default function AppRoutes() {
       <Route path="/signin" element={<SignIn />} />
 
       {/* Contribute Routes */}
+      <Route element={<ProtectedRoute />}>
+
       <Route path="/contribute" element={<Contribute />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/contribute/famous-spots" element={<FamousSpotsForm />} />
       <Route path="/contribute/hidden-spots" element={<HiddenSpotsForm />} />
       <Route path="/contribute/famous-foods" element={<FamousFoodsForm />} />
       <Route path="/contribute/history" element={<HistoryForm />} />
       <Route path="/contribute/handicrafts" element={<HandicraftsForm />} />
       <Route path="/contribute/your-info" element={<YourInfoForm />} />
+      </Route>
 
       {/* Dynamic City Route */}
       <Route path="/city/:cityName" element={<CityLanding />} />

@@ -4,4 +4,4 @@ export default function Dashboard() {
       <h1>Dashboard</h1>
       <p>Welcome to your dashboard!</p>
     </div>
-  )};
+  )}; 

@@ -1,13 +1,41 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import api, { setAccessToken } from "@/api/axios";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
-    accessToken: null,
-    role: null
+    role: null,
+    loading: true, 
   });
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        //Refresh access token using cookie
+        const res = await api.post("/auth/refresh");
+        setAccessToken(res.data.accessToken);
+
+        //Fetch current user
+        const me = await api.get("/auth/me");
+
+        setAuth({
+          user: me.data,
+          role: me.data.role,
+          loading: false,
+        });
+      } catch (err) {
+        setAuth({
+          user: null,
+          role: null,
+          loading: false,
+        });
+      }
+    };
+
+    initAuth();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
@@ -16,5 +44,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Modern helper hook
 export const useAuth = () => useContext(AuthContext);

@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Lock, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import axios from "../api/axios";
+import api from "../api/axios";
 
 // ✅ Zod schema for validation
 const registerSchema = z
@@ -54,7 +54,7 @@ const onSubmit = async (data) => {
     // Extract only required fields (ignore confirmPassword)
     const { username, email, password } = data;
 
-    const response = await axios.post("/api/auth/register", {
+    const response = await api.post("/auth/register", {
       username,
       email,
       password
