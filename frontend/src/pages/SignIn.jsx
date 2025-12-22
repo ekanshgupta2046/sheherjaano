@@ -1,4 +1,4 @@
-"use client";
+
 import React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Mail, Lock, ArrowRight, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthProvider";
 import api, { setAccessToken } from "@/api/axios";
+import { useNavigate, Link } from "react-router-dom";
+
 
 // ✅ Zod validation schema
 const signInSchema = z.object({
@@ -25,6 +27,9 @@ const signInSchema = z.object({
 });
 
 export default function SignIn() {
+
+  
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -37,6 +42,7 @@ const { setAuth } = useAuth();
 const [errorMsg, setErrorMsg] = useState("");
 
 const onSubmit = async (data) => {
+
   try {
     setErrorMsg("");
 
@@ -54,6 +60,7 @@ const onSubmit = async (data) => {
 
     console.log("✅ Login Successful:", user);
     alert("Sign-in successful!");
+    navigate("/", { replace: true });
   } catch (err) {
     if (!err?.response) {
       setErrorMsg("No Server Response");
@@ -102,13 +109,6 @@ const onSubmit = async (data) => {
             {isSubmitSuccessful ? (
               <div className="text-center space-y-3">
                 <h3 className="text-2xl font-bold text-amber-900">🎉 Signed In Successfully!</h3>
-                <p className="text-orange-700">
-                  You can now{" "}
-                  <a href="/" className="font-semibold text-orange-600 hover:underline">
-                    explore the site
-                  </a>
-                  .
-                </p>
               </div>
             ) : (
               <>
@@ -162,9 +162,9 @@ const onSubmit = async (data) => {
 
                 <p className="text-center text-sm text-amber-800 mt-6">
                   Don’t have an account?{" "}
-                  <a href="/register" className="text-orange-700 font-semibold hover:underline">
+                  <Link to="/register" className="text-orange-700 font-semibold hover:underline">
                     Register
-                  </a>
+                  </Link>
                 </p>
               </form>
               </>

@@ -1,4 +1,4 @@
-"use client";
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { User, Mail, Lock, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import api from "../api/axios";
+import { Link } from "react-router-dom";
 
 // ✅ Zod schema for validation
 const registerSchema = z
@@ -201,9 +202,9 @@ const onSubmit = async (data) => {
 
                 <p className="text-center text-sm text-amber-800 mt-6">
                   Already have an account?{" "}
-                  <a href="/signin" className="text-orange-700 font-semibold hover:underline">
-                    Sign In
-                  </a>
+                    <Link to="/signin" className="text-orange-700 font-semibold hover:underline">
+                      Sign In
+                    </Link>
                 </p>
               </form>
               </>

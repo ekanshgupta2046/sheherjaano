@@ -1,16 +1,27 @@
 import { MapPin, Instagram, Twitter, Facebook } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 export default function Footer() {
-  const sections = [
-    {
-      title: "Explore",
-      links: ["Popular Cities", "Hidden Gems", "Food & Culture"],
-    },
-    {
-      title: "Community",
-      links: ["Contribute", "Local Stories", "Connect"],
-    },
-  ];
+const sections = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Popular Cities", to: "/" },
+      { label: "Hidden Gems", to: "/" },
+      { label: "Food & Culture", to: "/" },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
+      { label: "Contribute", to: "/contribute" },
+      { label: "Local Stories", to: "/" },
+      { label: "Connect", to: "/" },
+    ],
+  },
+];
+
 
   const socialIcons = [
     { icon: <Instagram className="h-5 w-5" />, href: "#" },
@@ -48,12 +59,12 @@ export default function Footer() {
               <ul className="space-y-2 text-red-600">
                 {section.links.map((link, j) => (
                   <li key={j}>
-                    <a
-                      href="#"
+                    <Link
+                      to={link.to}
                       className="hover:text-red-800 transition-colors duration-200"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

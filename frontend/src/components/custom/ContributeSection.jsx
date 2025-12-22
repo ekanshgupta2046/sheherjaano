@@ -1,5 +1,6 @@
 import { Heart, Users, Star, Leaf, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function ContributeSection() {
   const reasons = [
@@ -79,9 +80,9 @@ export default function ContributeSection() {
               asChild
               className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white text-lg font-semibold shadow-lg px-10 py-6 rounded-full transition-transform duration-300 hover:scale-105"
             >
-              <a href="/contribute">
+              <Link to="/contribute">
                 Contribute Now <ArrowRight className="inline-block ml-2 h-5 w-5" />
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
