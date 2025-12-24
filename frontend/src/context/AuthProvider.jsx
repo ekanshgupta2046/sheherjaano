@@ -37,12 +37,28 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  useEffect(() => {
-  console.log("Auth state changed:");
-}, [auth]);
+      const logout = async () => {
+      try {
+        await api.post("/auth/logout", {}, { withCredentials: true });
+      } catch (err) {
+        console.error("Logout failed", err);
+      } finally {
+        setAuth({
+          user: null,
+          role: null,
+          loading: false,
+        });
+        setAccessToken(null);
+      }
+    };
+
+
+      useEffect(() => {
+      console.log("Auth state changed:");
+    }, [auth]);
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth }}>
+    <AuthContext.Provider value={{ auth, setAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

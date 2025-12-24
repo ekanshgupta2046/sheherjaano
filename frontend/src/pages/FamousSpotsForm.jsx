@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, ImagePlus, Video, Instagram } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {api} from "@/api/axios"
 
 export default function FamousSpotsForm() {
   const {
@@ -30,14 +31,23 @@ export default function FamousSpotsForm() {
   const images = watch("images") || [];
   const permission = watch("permission");
 
-  const onSubmit = useCallback((data) => {
-    if (!data.permission) {
-      alert("Please confirm permission to submit!");
-      return;
-    }
+const onSubmit = useCallback(async (data) => {
+  if (!data.permission) {
+    alert("Please confirm permission to submit!");
+    return;
+  }
 
-    console.log("Form Data:", data);
-  }, []);
+  try {
+    const res = await api.post("/famous-spots", data);
+
+    alert("Spot saved successfully!");
+    console.log("Saved Data:", res.data);
+
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Failed to save data");
+  }
+}, []);
 
   const handleImageUpload = useCallback(
     (e) => {
