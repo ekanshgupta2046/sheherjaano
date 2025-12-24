@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRouter from "./routes/authRouter.js";
 import cookieParser from "cookie-parser";
+import famousSpotRoute from "./routes/famousSpotRoutes.js";
 
 const app = express();
 
@@ -23,5 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+
+app.use("/api/famous-spots", famousSpotRoute);
 
 export default app;

@@ -8,27 +8,47 @@ export const refreshAccessToken = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const refreshToken = cookies.jwt;
+    const oldRefreshToken = cookies.jwt;
 
-    const user = await User.findOne({ refreshToken });
+    const user = await User.findOne({ refreshToken: oldRefreshToken });
     if (!user) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
     jwt.verify(
-      refreshToken,
+      oldRefreshToken,
       process.env.REFRESH_TOKEN_SECRET,
-      (err, decoded) => {
+      async (err, decoded) => {
         if (err || decoded.id !== user._id.toString()) {
           return res.status(403).json({ message: "Forbidden" });
         }
 
+        // Generate NEW tokens
         const newAccessToken = jwt.sign(
           { id: user._id, role: user.role },
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: "60s" }
         );
 
+        const newRefreshToken = jwt.sign(
+          { id: user._id },
+          process.env.REFRESH_TOKEN_SECRET,
+          { expiresIn: "1d" }
+        );
+
+        // ROTATE refresh token in DB
+        user.refreshToken = newRefreshToken;
+        await user.save();
+
+        // Replace cookie
+        res.cookie("jwt", newRefreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+          maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        // Send new access token
         res.json({ accessToken: newAccessToken });
       }
     );

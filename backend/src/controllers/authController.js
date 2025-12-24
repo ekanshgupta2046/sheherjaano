@@ -80,3 +80,41 @@ export const getMe = async (req, res) => {
   }
 };
 
+
+export const logoutUser = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    // If no refresh token, just clear cookie and exit
+    if (!refreshToken) {
+      return res
+        .clearCookie("refreshToken", {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+        })
+        .status(204)
+        .json({ message: "Logged out" });
+    }
+
+    // Find user with this refresh token
+    const user = await User.findOne({ refreshToken });
+
+    if (user) {
+      user.refreshToken = "";
+      await user.save();
+    }
+
+    // Clear refresh token cookie
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    console.error("Logout error:", err);
+    return res.status(500).json({ message: "Logout failed" });
+  }
+};
