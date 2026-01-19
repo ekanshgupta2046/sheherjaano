@@ -7,37 +7,47 @@ const handicraftSchema = new mongoose.Schema(
       required: [true, "Handicraft name is required"],
       trim: true,
     },
-    category: {
-      type: String,
-      enum: ["Textile", "Metalwork", "Woodcraft", "Pottery", "Jewelry", "Painting", "Other"],
-      default: "Other",
-    },
     description: {
       type: String,
       required: [true, "Description is required"],
       trim: true,
     },
-    originCity: {
+        state: { 
       type: String,
-      required: [true, "Origin city or region is required"],
-      trim: true,
+      required: [true, "State is required"],  
+      trim: true 
     },
-    culturalSignificance: {
+    city: {
       type: String,
+      required: [true, "City is required"],
       trim: true,
+      index: true,
     },
-    materialsUsed: {
-      type: [String],
-      default: [],
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
     },
+
+    totalRatings: {
+      type: Number,
+      default: 0
+    },
+    localMarkets: [
+  {
+    name: { type: String, trim: true },
+    address: { type: String, trim: true }
+  }
+],
     priceRange: {
       type: String,
       trim: true,
       default: "Varies",
     },
     images: {
-      type: [String], // store image URLs (e.g., from Cloudinary)
-      validate: [(v) => v.length > 0, "At least one image is required"],
+      type: [String],
+      default: [],
     },
     videoLink: {
       type: String,
@@ -47,7 +57,18 @@ const handicraftSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    createdBy: {
+        geometry: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0] // Default until you add the map feature
+      }
+    },
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to the user or contributor who uploaded it
       required: true,
@@ -59,7 +80,7 @@ const handicraftSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+handicraftSchema.index({ geometry: '2dsphere' });
 const Handicraft = mongoose.model("Handicraft", handicraftSchema);
 
 export default Handicraft;

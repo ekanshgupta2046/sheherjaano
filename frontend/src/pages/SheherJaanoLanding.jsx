@@ -31,6 +31,7 @@ export default function SheherJaanoLanding() {
     }
   };
 
+
   return (
     <div className="min-h-screen">
 
@@ -39,7 +40,7 @@ export default function SheherJaanoLanding() {
       <AboutSection />
       <FeaturedCitiesSection />
       <ContributeSection />
-      <CTASection />
+      <CTASection onScrollToFeatured={scrollToFeatured} />
       <Footer />
     </div>
   );

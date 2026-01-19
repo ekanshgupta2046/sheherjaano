@@ -3,25 +3,39 @@ import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { State, City } from "country-state-city";
 
 export default function FeaturedCities() {
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
+  // --- STATE FOR DROPDOWNS ---
+  const [selectedStateCode, setSelectedStateCode] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+
+  // Logic to fetch lists
+  const allStates = State.getStatesOfCountry("IN");
+  const allCities = selectedStateCode 
+    ? City.getCitiesOfState("IN", selectedStateCode) 
+    : [];
+
+  // Hardcoded Featured Cities 
   const cities = [
-    { name: "Mumbai", spots: "1,247", image: "mumbai.jpg" },
-    { name: "Delhi", spots: "892", image: "delhi.jpg" },
-    { name: "Bangalore", spots: "634", image: "bangalore.jpg" },
-    { name: "Kolkata", spots: "578", image: "kolkata.jpg" },
+    { name: "Mumbai", state: "Maharashtra", spots: "1,247", image: "/mumbai.jpg" },
+    { name: "New Delhi", state: "Delhi", spots: "892", image: "/delhi.jpg" },
+    { name: "Bangalore", state: "Karnataka", spots: "634", image: "/bangalore.jpg" },
+    { name: "Kolkata", state: "West Bengal", spots: "578", image: "/kolkata.jpg" },
   ];
 
-  const filteredCities = cities.filter((city) =>
-    city.name.toLowerCase().includes(query.toLowerCase())
-  );
-
   const handleExplore = () => {
-    if (query.trim()) {
-      navigate(`/city/${query.trim().toLowerCase()}`);
+    if (selectedStateCode && selectedCity) {
+      // 1. Get the real names
+      const stateName = State.getStateByCodeAndCountry(selectedStateCode, "IN").name;
+      const cityName = selectedCity;
+
+      // 2. Navigate to: /city/Maharashtra/Mumbai
+      navigate(`/city/${encodeURIComponent(stateName)}/${encodeURIComponent(cityName)}`);
+    } else {
+      alert("Please select both a State and a City!");
     }
   };
 
@@ -61,15 +75,40 @@ export default function FeaturedCities() {
           transition={{ duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
         >
-          <div className="flex items-center bg-white/80 border border-amber-300 rounded-full shadow-md px-4 py-2 w-full sm:w-96 backdrop-blur-md">
-            <Search className="text-amber-700 w-5 h-5 mr-2" />
-            <input
-              type="text"
-              placeholder="Search for a city..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="bg-transparent w-full focus:outline-none text-amber-900 placeholder-amber-700/60"
-            />
+          <div className="flex items-center bg-white/80 border border-amber-300 rounded-full shadow-md px-4 py-2 w-full sm:w-[32rem] backdrop-blur-md gap-2">
+            
+            <Search className="text-amber-700 w-5 h-5 flex-shrink-0" />
+            
+            {/* State Dropdown */}
+            <select
+              value={selectedStateCode}
+              onChange={(e) => {
+                setSelectedStateCode(e.target.value);
+                setSelectedCity(""); // Reset city when state changes
+              }}
+              className="bg-transparent w-1/2 focus:outline-none text-amber-900 placeholder-amber-700/60 truncate cursor-pointer"
+            >
+              <option value="">Select State</option>
+              {allStates.map((state) => (
+                <option key={state.isoCode} value={state.isoCode}>{state.name}</option>
+              ))}
+            </select>
+
+            {/* Vertical Divider Line */}
+            <div className="h-6 w-[1px] bg-amber-300"></div>
+
+            {/* City Dropdown */}
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              disabled={!selectedStateCode}
+              className={`bg-transparent w-full focus:outline-none text-amber-900 placeholder-amber-700/60 cursor-pointer ${!selectedStateCode ? 'opacity-50' : ''}`}
+            >
+              <option value="">Select City</option>
+              {allCities.map((city) => (
+                <option key={city.name} value={city.name}>{city.name}</option>
+              ))}
+            </select>
           </div>
 
           <button
@@ -85,7 +124,7 @@ export default function FeaturedCities() {
 
         {/* City Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {filteredCities.map((city, index) => (
+          {cities.map((city, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 50 }}
@@ -94,7 +133,7 @@ export default function FeaturedCities() {
               viewport={{ once: true }}
             >
               <Card
-                onClick={() => navigate(`/city/${city.name.toLowerCase()}`)}
+                onClick={() => navigate(`/city/${encodeURIComponent(city.state)}/${encodeURIComponent(city.name)}`)}
                 className="group relative cursor-pointer overflow-hidden rounded-3xl shadow-lg hover:shadow-[0_10px_40px_rgba(255,170,0,0.4)] transition-all duration-500 border border-amber-200"
               >
                 {/* Image */}

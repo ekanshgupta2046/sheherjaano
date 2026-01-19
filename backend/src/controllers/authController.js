@@ -25,13 +25,13 @@ export const loginUser = async (req, res) => {
 
     // 4. Generate tokens
     const accessToken = jwt.sign(
-      { id: user._id, role: user.role },
+      { _id: user._id, role: user.role },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "60s" }
     );
 
     const refreshToken = jwt.sign(
-      { id: user._id },
+      { _id: user._id },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
@@ -41,7 +41,7 @@ export const loginUser = async (req, res) => {
     await user.save();
 
     // 6. Send refresh token as httpOnly cookie
-    res.cookie("jwt", refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,        // true in production (https)
       sameSite: "None",    // required for cross-site cookies
@@ -53,7 +53,7 @@ export const loginUser = async (req, res) => {
       message: `Welcome ${user.username}!`,
       accessToken,
       user: {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
@@ -68,7 +68,7 @@ export const loginUser = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     // req.user comes from verifyJWT
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user._id).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

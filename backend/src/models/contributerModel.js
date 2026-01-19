@@ -54,7 +54,30 @@ const contributorSchema = new mongoose.Schema(
       required: true,
       default: false,
     },
-    createdBy: {
+        state: { 
+      type: String,
+      required: [true, "State is required"],  
+      trim: true 
+    },
+    city: {
+      type: String,
+      required: [true, "City is required"],
+      trim: true,
+      index: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+
+    totalRatings: {
+      type: Number,
+      default: 0
+    },
+
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // The user who submitted this contributor info
       required: true,

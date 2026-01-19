@@ -12,7 +12,6 @@ import { useAuth } from "../context/AuthProvider";
 import api, { setAccessToken } from "@/api/axios";
 import { useNavigate, Link } from "react-router-dom";
 
-
 // ✅ Zod validation schema
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -28,7 +27,7 @@ const signInSchema = z.object({
 
 export default function SignIn() {
 
-  
+   const { initAuth } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -39,6 +38,7 @@ export default function SignIn() {
   });
 
 const { setAuth } = useAuth();
+const { login } = useAuth();
 const [errorMsg, setErrorMsg] = useState("");
 
 const onSubmit = async (data) => {
@@ -52,11 +52,19 @@ const onSubmit = async (data) => {
 
     const accessToken = response?.data?.accessToken;
     const user = response?.data?.user;
-    const role = response?.data?.role;
+    const role = response?.data?.user?.role;
 
-    setAuth({ user, accessToken, role });
+    // setAuth(prev => ({
+    //   ...prev,
+    //   user,
+    //   role,
+    //   loading: false,
+    // }));
 
-    setAccessToken(response.data.accessToken);
+    setAccessToken(accessToken);
+    login(user, accessToken);
+    navigate("/", { replace: true });
+
 
     console.log("✅ Login Successful:", user);
     alert("Sign-in successful!");

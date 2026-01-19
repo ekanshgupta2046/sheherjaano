@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "@/api/axios"
 import {
   MapPin,
   Landmark,
@@ -9,17 +10,41 @@ import {
   Palette,
   User,
   ArrowRight,
+  MessageCircle,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import WeatherWidget from "@/components/custom/WeatherWidget";
 
 export default function CityLanding() {
-  const { cityName } = useParams();
+  const { cityName,stateName } = useParams();
   const navigate = useNavigate();
   const displayName = cityName.charAt(0).toUpperCase() + cityName.slice(1);
+  const displayState = stateName.charAt(0).toUpperCase() + stateName.slice(1);
 
   // Background images from public/images
-  const images = Array.from({ length: 5 }, (_, i) => `/images/${cityName}/${i + 1}.jpg`);
+  // const images = Array.from({ length: 5 }, (_, i) => `/images/${cityName}/${i + 1}.jpg`);
   const [currentImage, setCurrentImage] = useState(0);
+  const [images, setImages] = useState([]);
+const [loadingImages, setLoadingImages] = useState(true);
+
+useEffect(() => {
+  const fetchHeroImages = async () => {
+    try {
+      const res = await api.get(
+        `/city/${stateName}/${cityName}/hero-images`
+      );
+      setImages(res.data);
+    } catch (err) {
+      console.error("Failed to load hero images");
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  fetchHeroImages();
+}, [cityName, stateName]);
+
+const isEmptyCity = !loadingImages && images.length === 0;
 
   // Rotate every 6 seconds
   useEffect(() => {
@@ -34,37 +59,37 @@ export default function CityLanding() {
       name: "Famous Spots",
       icon: <Landmark className="w-8 h-8 text-amber-700" />,
       desc: "Explore the iconic landmarks and must-visit attractions.",
-      link: `/city/${cityName}/famous-spots`,
+      link: `/city/${stateName}/${cityName}/famous-spots`,
     },
     {
       name: "Hidden Spots",
       icon: <MapPin className="w-8 h-8 text-amber-700" />,
       desc: "Discover secret gems known only to locals.",
-      link: `/city/${cityName}/hidden-spots`,
+      link: `/city/${stateName}/${cityName}/hidden-spots`,
     },
     {
       name: "Food",
       icon: <UtensilsCrossed className="w-8 h-8 text-amber-700" />,
       desc: "Taste the authentic local dishes and street food.",
-      link: `/city/${cityName}/famous-foods`,
+      link: `/city/${stateName}/${cityName}/famous-food`,
     },
     {
       name: "History",
       icon: <History className="w-8 h-8 text-amber-700" />,
       desc: "Dive into stories and monuments that define the city.",
-      link: `/city/${cityName}/history`,
+      link: `/city/${stateName}/${cityName}/history`,
     },
     {
       name: "Handicrafts",
       icon: <Palette className="w-8 h-8 text-amber-700" />,
       desc: "Admire traditional craftsmanship and unique art forms.",
-      link: `/city/${cityName}/handicrafts`,
+      link: `/city/${stateName}/${cityName}/handicrafts`,
     },
     {
-      name: "Local Guides",
-      icon: <User className="w-8 h-8 text-amber-700" />,
-      desc: "Meet friendly locals who can guide your journey.",
-      link: `/city/${cityName}/locals`,
+      name: "Ask About This City",
+      icon: <MessageCircle className="w-8 h-8 text-amber-700" />,
+      desc: "Ask locals your questions and get real insights.",
+      link: `/city/${stateName}/${cityName}/questions`,
     },
   ];
 
@@ -74,7 +99,7 @@ export default function CityLanding() {
   };
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative  overflow-hidden">
       {/* Hero Section with Background Slideshow */}
       <div className="relative h-screen flex flex-col justify-center items-center text-center text-white">
         <AnimatePresence>
@@ -94,6 +119,28 @@ export default function CityLanding() {
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-transparent"></div>
+            {/* Weather Widget Layer */}
+        <div
+  className="
+    absolute
+    bottom-3 right-3
+    sm:bottom-6 sm:right-6
+    z-20
+    origin-bottom-right
+    pointer-events-auto
+
+    max-[350px]:scale-[0.55]   /* iPhone SE */
+    max-[400px]:scale-[0.65]   /* small Android */
+    scale-[0.75]               /* normal mobile */
+    sm:scale-100               /* tablet/desktop */
+  "
+>
+          <WeatherWidget
+  city={cityName}
+  isEmptyCity={isEmptyCity}
+/>
+
+        </div>
 
         {/* Hero Text */}
         <motion.div
@@ -116,6 +163,7 @@ export default function CityLanding() {
             Start Exploring
           </motion.button>
         </motion.div>
+
       </div>
 
       {/* Cards Section */}

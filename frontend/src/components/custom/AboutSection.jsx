@@ -84,7 +84,7 @@ export default function AboutSection() {
       </div>
 
       {/* Cards */}
-      <div className="relative max-w-7xl mx-auto space-y-16 px-6 md:px-10">
+      <div className="relative max-w-7xl mx-auto space-y-10 sm:space-y-16 px-6 md:px-10">
         {aboutCards.map((card, index) => (
           <motion.div
             key={index}
@@ -102,7 +102,7 @@ export default function AboutSection() {
               <img
                 src={card.image}
                 alt={card.title}
-                className="w-full h-[340px] md:h-[380px] lg:h-[420px] object-cover rounded-none transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-[220px] sm:h-[260px] md:h-[380px] lg:h-[420px]object-cover rounded-none transition-transform duration-500 group-hover:scale-105"
               />
               {/* Golden glow border */}
               <div className="absolute inset-0 bg-gradient-to-t from-amber-600/20 to-transparent group-hover:from-amber-600/30"></div>
@@ -110,14 +110,15 @@ export default function AboutSection() {
             </div>
 
             {/* Text Section */}
-            <div className="p-10 md:p-12 flex flex-col justify-center lg:w-[55%]">
-              <div className="h-14 w-14 bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-50 rounded-2xl flex items-center justify-center mb-5 shadow-md border border-amber-300">
+            <div className="p-6 sm:p-8 md:p-12 flex flex-col justify-center lg:w-[55%]">
+
+              <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-50 rounded-2xl flex items-center justify-center mb-4 sm:mb-5 shadow-md border border-amber-300">
                 {card.icon}
               </div>
-              <h3 className="text-3xl md:text-4xl font-bold text-orange-700 mb-4 font-serif tracking-tight">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-700 mb-4 font-serif tracking-tight">
                 {card.title}
               </h3>
-              <p className="text-lg text-red-800 leading-relaxed tracking-wide font-medium">
+              <p className="text-base sm:text-lg text-red-800 leading-relaxed tracking-wide font-medium">
                 {card.description}
               </p>
             </div>

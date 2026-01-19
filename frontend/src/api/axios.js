@@ -21,4 +21,49 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+export const refreshAccessToken = async () => {
+  const response = await axios.post(
+    "http://localhost:5000/api/auth/refresh",
+    {},
+    { withCredentials: true }
+  );
+
+  const newAccessToken = response.data.accessToken;
+  setAccessToken(newAccessToken);
+  return newAccessToken;
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 🚫 DO NOT retry refresh endpoint
+    if (originalRequest?.url?.includes("/auth/refresh")) {
+      return Promise.reject(error);
+    }
+
+    if (
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await refreshAccessToken();
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (err) {
+        // refresh failed → logout
+        setAccessToken(null);
+        return Promise.reject(err);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
 export default api;

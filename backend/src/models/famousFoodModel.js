@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// 📍 Sub-schema for places where the food is famous
+
 const placeSchema = new mongoose.Schema({
   placeName: {
     type: String,
@@ -22,12 +22,23 @@ const placeSchema = new mongoose.Schema({
     trim: true,
     default: "", 
   },
+    geometry: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true,
+    },
+  },
 });
 
-// 🍲 Main schema for famous foods
+
 const famousFoodSchema = new mongoose.Schema(
   {
-    // 🔤 Basic details
+    
     foodName: {
       type: String,
       required: [true, "Food name is required"],
@@ -43,18 +54,16 @@ const famousFoodSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // 🧭 Array of subdocuments
+   
     places: {
       type: [placeSchema],
       validate: [(v) => v.length > 0, "At least one place must be added"],
     },
 
-    // 🖼️ Media
-    foodImages: [
-      {
-        type: String, // Cloudinary or local image URL
-      },
-    ],
+    images: {
+      type: [String],
+      default: [],
+    },
     videoLink: {
       type: String,
       trim: true,
@@ -63,15 +72,36 @@ const famousFoodSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+        state: { 
+      type: String,
+      required: [true, "State is required"],  
+      trim: true 
+    },
+    city: {
+      type: String,
+      required: [true, "City is required"],
+      trim: true,
+      index: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
 
-    // 👤 Linked to user (the one who submitted)
-    createdBy: {
+    totalRatings: {
+      type: Number,
+      default: 0
+    },
+    
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    // 🔒 Optional moderation
+    
     isApproved: {
       type: Boolean,
       default: false,
@@ -79,5 +109,6 @@ const famousFoodSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+famousFoodSchema.index({ "places.geometry": "2dsphere" });
 
 export default mongoose.model("FamousFood", famousFoodSchema);

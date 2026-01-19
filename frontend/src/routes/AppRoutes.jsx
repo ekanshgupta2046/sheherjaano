@@ -20,6 +20,12 @@ import Register from "@/pages/Register";
 import SignIn from "@/pages/SignIn";
 import ProtectedRoute from "./ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
+import FamousSpotDetails from "@/pages/FamousSpotDetails";
+import FamousFoodDetails from "@/pages/FamousFoodDetails";
+import HandicraftDetails from "../pages/HandicraftDetails";
+import HistoryDetails from "../pages/HistoryDetails";
+import QuestionsHub from "@/pages/QuestionsHub";
+import QuestionDetail from "@/pages/QuestionDetail";
 
 export default function AppRoutes() {
   return (
@@ -44,14 +50,21 @@ export default function AppRoutes() {
       </Route>
 
       {/* Dynamic City Route */}
-      <Route path="/city/:cityName" element={<CityLanding />} />
+      <Route path="/city/:stateName/:cityName" element={<CityLanding />} />
 
-      <Route path="/city/:cityName/famous-spots" element={<FamousSpots />} />
-      <Route path="/city/:cityName/hidden-spots" element={<HiddenSpots />} />
-      <Route path="/city/:cityName/famous-foods" element={<FamousFoods />} />
-      <Route path="/city/:cityName/history" element={<History />} />
-      <Route path="/city/:cityName/handicrafts" element={<FamousHandicrafts />} />
-      <Route path="/city/:cityName/locals" element={<InfoSection />} />
+      <Route path="/city/:stateName/:cityName/famous-spots" element={<FamousSpots />} />
+      <Route path="/famous-spot/:id" element={<FamousSpotDetails />} />
+      <Route path="/famous-food/:id" element={<FamousFoodDetails />} />
+      <Route path="/hidden-spot/:id" element={<FamousSpotDetails />} />
+      <Route path="/handicraft/:id" element={<HandicraftDetails />} />
+      <Route path="/history/:id" element={<HistoryDetails />} />
+      <Route path="/city/:stateName/:cityName/hidden-spots" element={<HiddenSpots />} />
+      <Route path="/city/:stateName/:cityName/famous-food" element={<FamousFoods />} />
+      <Route path="/city/:stateName/:cityName/history" element={<History />} />
+      <Route path="/city/:stateName/:cityName/handicrafts" element={<FamousHandicrafts />} />
+      <Route path="/city/:stateName/:cityName/questions" element={<QuestionsHub />} />
+      <Route path="/city/:stateName/:cityName/questions/:questionId" element={<QuestionDetail />} />
+      <Route path="/city/:stateName/:cityName/locals" element={<InfoSection />} />
 
     </Routes>
   );

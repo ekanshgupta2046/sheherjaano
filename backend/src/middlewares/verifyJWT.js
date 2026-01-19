@@ -1,7 +1,8 @@
 // middleware/verifyJWT.js
 import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
 
-const verifyJWT = (req, res, next) => {
+const verifyJWT = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -10,17 +11,34 @@ const verifyJWT = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
     if (err) {
-      return res.status(403).json({ message: "Forbidden (invalid or expired token)" });
+      // Standard HTTP: 401 = Unauthorized (invalid/expired token)
+      return res.status(401).json({ message: "Unauthorized (invalid or expired token)" });
     }
 
-    req.user = {
-      id: decoded.id,
-      role: decoded.role,
-    };
+    try {
+      // Fetch user from database to get username
+      const userId = decoded._id || decoded.id;
+      const user = await User.findById(userId);
 
-    next();
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      // Support tokens that store the id as either `_id` or `id`
+      req.user = {
+        _id: userId,
+        id: userId, // For backward compatibility
+        username: user.username,
+        role: decoded.role,
+      };
+
+      next();
+    } catch (error) {
+      console.error("Error in verifyJWT:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
   });
 };
 

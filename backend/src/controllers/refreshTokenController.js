@@ -4,12 +4,11 @@ import User from "../models/userModel.js";
 export const refreshAccessToken = async (req, res) => {
   try {
     const cookies = req.cookies;
-    if (!cookies?.jwt) {
+    if (!cookies?.refreshToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const oldRefreshToken = cookies.jwt;
-
+    const oldRefreshToken = cookies.refreshToken;
     const user = await User.findOne({ refreshToken: oldRefreshToken });
     if (!user) {
       return res.status(403).json({ message: "Forbidden" });
@@ -19,19 +18,19 @@ export const refreshAccessToken = async (req, res) => {
       oldRefreshToken,
       process.env.REFRESH_TOKEN_SECRET,
       async (err, decoded) => {
-        if (err || decoded.id !== user._id.toString()) {
+        if (err || decoded._id !== user._id.toString()) {
           return res.status(403).json({ message: "Forbidden" });
         }
 
         // Generate NEW tokens
         const newAccessToken = jwt.sign(
-          { id: user._id, role: user.role },
+          { _id: user._id, role: user.role },
           process.env.ACCESS_TOKEN_SECRET,
           { expiresIn: "60s" }
         );
 
         const newRefreshToken = jwt.sign(
-          { id: user._id },
+          { _id: user._id },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: "1d" }
         );
@@ -41,7 +40,7 @@ export const refreshAccessToken = async (req, res) => {
         await user.save();
 
         // Replace cookie
-        res.cookie("jwt", newRefreshToken, {
+        res.cookie("refreshToken", newRefreshToken, {
           httpOnly: true,
           secure: true,
           sameSite: "None",

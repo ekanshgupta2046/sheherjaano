@@ -51,16 +51,52 @@ const famousSpotSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
-    createdBy: {
+    state: { 
+      type: String,
+      required: [true, "State is required"],  
+      trim: true 
+    },
+    city: {
+      type: String,
+      required: [true, "City is required"],
+      trim: true,
+      index: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+
+    totalRatings: {
+      type: Number,
+      default: 0
+    },
+
+    geometry: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0] // Default until you add the map feature
+      }
+    },
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // later when you make contributor model
+      ref: "User", 
       required: false,
     },
   },
   {
-    timestamps: true, // auto adds createdAt & updatedAt
+    timestamps: true,
   }
 );
+
+famousSpotSchema.index({ geometry: '2dsphere' });
 
 const FamousSpot = mongoose.model("FamousSpot", famousSpotSchema);
 

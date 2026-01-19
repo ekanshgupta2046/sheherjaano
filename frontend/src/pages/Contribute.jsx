@@ -54,14 +54,14 @@ export default function Contribute() {
   ];
 
   return (
-    <section className="relative pt-12 pb-20 bg-gradient-to-b from-yellow-50 via-amber-100 to-orange-50 overflow-hidden">
+    <section className="relative min-h-screen pt-12 pb-20 bg-gradient-to-b from-yellow-50 via-amber-100 to-orange-50 overflow-hidden">
       {/* Ethnic Pattern */}
       <div className="absolute inset-0 bg-[url('/ethnic-pattern.png')] opacity-[0.04] bg-repeat"></div>
 
       {/* Glow */}
       <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-radial from-amber-200/30 to-transparent blur-3xl"></div>
 
-      <div className="relative container mx-auto px-6">
+      <div className="relative container mx-auto px-6 overflow-hidden">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -80,7 +80,7 @@ export default function Contribute() {
         </motion.div>
 
         {/* Horizontal Bar Layout */}
-        <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+        <div className="flex flex-col gap-6 max-w-3xl mx-auto overflow-hidden">
           {badges.map((badge, i) => (
             <motion.div
               key={i}

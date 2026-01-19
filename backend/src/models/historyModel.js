@@ -44,8 +44,8 @@ const historySchema = new mongoose.Schema(
       trim: true,
     },
     images: {
-      type: [String], // Array of image URLs (from Cloudinary or file uploads)
-      validate: [(v) => v.length > 0, "At least one image must be added"],
+      type: [String],
+      default: [],
     },
     videoLink: {
       type: String,
@@ -55,7 +55,41 @@ const historySchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    createdBy: {
+        state: { 
+      type: String,
+      required: [true, "State is required"],  
+      trim: true 
+    },
+    city: {
+      type: String,
+      required: [true, "City is required"],
+      trim: true,
+      index: true,
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+
+    totalRatings: {
+      type: Number,
+      default: 0
+    },
+
+    geometry: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0] // Default until you add the map feature
+      }
+    },
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // user who added this history record
       required: true,
@@ -67,7 +101,7 @@ const historySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+historySchema.index({ geometry: '2dsphere' });
 const History = mongoose.model("History", historySchema);
 
 export default History;

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function CTASection() {
+export default function CTASection({ onScrollToFeatured }) {
   const navigate = useNavigate();
 
   return (
@@ -21,7 +21,7 @@ export default function CTASection() {
             <Button
               size="lg"
               className="text-lg px-8 py-6 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white shadow-lg transition-transform hover:scale-105"
-              onClick={() => navigate("/cities")}
+              onClick={onScrollToFeatured}
             >
               Browse Cities <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
