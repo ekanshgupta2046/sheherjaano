@@ -44,7 +44,8 @@ export const loginUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,        // true in production (https)
-      sameSite: "None",    // required for cross-site cookies
+      sameSite: "None",  
+      path: "/",   // required for cross-site cookies
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -92,6 +93,7 @@ export const logoutUser = async (req, res) => {
           httpOnly: true,
           secure: true,
           sameSite: "None",
+          path: "/", 
         })
         .status(204)
         .json({ message: "Logged out" });
@@ -110,6 +112,7 @@ export const logoutUser = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
+      path: "/", 
     });
 
     return res.status(200).json({ message: "Logout successful" });
