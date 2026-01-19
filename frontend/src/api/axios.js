@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: true,
 });
 
@@ -12,6 +12,7 @@ let accessToken = null;
 export const setAccessToken = (token) => {
   accessToken = token;
 };
+
 api.interceptors.request.use(
   (config) => {
     if (accessToken) {
@@ -24,7 +25,7 @@ api.interceptors.request.use(
 
 export const refreshAccessToken = async () => {
   const response = await axios.post(
-    "http://localhost:5000/api/auth/refresh",
+    `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
     {},
     { withCredentials: true }
   );
@@ -55,7 +56,6 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (err) {
-        // refresh failed → logout
         setAccessToken(null);
         return Promise.reject(err);
       }
@@ -64,6 +64,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export default api;
