@@ -19,9 +19,14 @@ const app = express();
 // Middlewares
 
 
+const allowedOrigins = [
+  "http://localhost:5173",              // local dev
+  "https://sheherjaano.vercel.app"      // deployed frontend
+];
+
 app.use(cors({
-  origin: "http://localhost:5173", // frontend URL
-  credentials: true,               // allow cookies / auth headers
+  origin: allowedOrigins,
+  credentials: true,
 }));
 
 app.use(express.json());
@@ -30,7 +35,7 @@ app.use(cookieParser());
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("✅ Sheherjaano backend is running!");
+  res.send("Sheherjaano backend is running!");
 });
 
 app.use("/api", uploadRoute);
