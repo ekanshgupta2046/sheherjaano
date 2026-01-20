@@ -72,7 +72,7 @@ router.post("/", verifyJWT, async (req, res) => {
       contribution = await Contribution.create({
         placeId: existingSpot._id,
         userId: req.user._id,
-        type: "spot",
+        type: "famousSpot",
         content: description,
         images,
         videoLink,

@@ -85,8 +85,7 @@ export default function FamousSpotsForm() {
 
       const uploadRes = await api.post(
         "/upload-images",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        formData
       );
 
       imageUrls = uploadRes.data.urls;
