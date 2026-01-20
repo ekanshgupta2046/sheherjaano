@@ -291,7 +291,7 @@ router.get("/:id", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error fetching spot with contributions:", err);
+    console.error("Error fetching spot with contributions:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 });

@@ -8,53 +8,82 @@ export async function getCoordinates({
   latitude,
   longitude,
 }) {
-  // 1️⃣ If user manually provides lat/lng → use it
+  // 1️⃣ Manual override
   if (latitude && longitude) {
     return [parseFloat(longitude), parseFloat(latitude)];
   }
 
-  async function fetchCoordinates(query) {
+  async function fetchPhoton(query, requireCityMatch = false) {
     try {
       const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(
         query
-      )}&limit=1`;
+      )}&limit=10`;
 
       const res = await axios.get(url);
-
       const features = res.data?.features;
-      if (
-        Array.isArray(features) &&
-        features.length > 0 &&
-        features[0].geometry?.coordinates
-      ) {
-        const [lon, lat] = features[0].geometry.coordinates;
+
+      if (!Array.isArray(features) || features.length === 0) {
+        return [0, 0];
+      }
+
+      // Normalize input
+      const cityLower = city.toLowerCase();
+      const stateLower = state.toLowerCase();
+
+      // 🔥 STRICT FILTER: same city + state
+      if (requireCityMatch) {
+        const match = features.find(f => {
+          const p = f.properties || {};
+          return (
+            p.city?.toLowerCase() === cityLower ||
+            p.county?.toLowerCase() === cityLower
+          ) && p.state?.toLowerCase() === stateLower;
+        });
+
+        if (!match) return [0, 0];
+
+        const [lon, lat] = match.geometry.coordinates;
         return [parseFloat(lon), parseFloat(lat)];
       }
 
-      // No match → fallback
+      // Loose match (fallback)
+      const [lon, lat] = features[0].geometry.coordinates;
+      return [parseFloat(lon), parseFloat(lat)];
+    } catch (err) {
+      console.log("Photon error:", err.message);
       return [0, 0];
-    } catch (error) {
-      console.log("Photon error:", error.message);
-      return [0, 0]; // Always fallback
     }
   }
 
-  // 2️⃣ Waterfall queries (most specific → least specific)
-  const queries = [
-    `${name}, ${address}, ${city}, ${state}`,
-    `${address}, ${city}, ${state}`,
-    `${city}, ${state}`,
+  // ===============================
+  // 1️⃣ STRICT spot-in-city search
+  // ===============================
+  const strictQueries = [
+    `${name}, ${address}, ${city}, ${state}, India`,
+    `${name}, ${city}, ${state}, India`,
   ];
 
-  for (const q of queries) {
-    const coords = await fetchCoordinates(q);
-
-    // Return if valid
+  for (const q of strictQueries) {
+    const coords = await fetchPhoton(q, true);
     if (!(coords[0] === 0 && coords[1] === 0)) {
       return coords;
     }
   }
 
-  // 3️⃣ Final fallback
+  // ===============================
+  // 2️⃣ FALLBACK → city center
+  // ===============================
+  const cityCoords = await fetchPhoton(
+    `${city}, ${state}, India`,
+    false
+  );
+
+  if (!(cityCoords[0] === 0 && cityCoords[1] === 0)) {
+    return cityCoords;
+  }
+
+  // ===============================
+  // 3️⃣ FINAL FALLBACK
+  // ===============================
   return [0, 0];
 }
