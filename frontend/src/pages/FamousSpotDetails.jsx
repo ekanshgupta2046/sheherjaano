@@ -15,8 +15,6 @@ import {
   ExternalLink,
   Youtube,
   Instagram,
-  Share2,
-  Heart,
 } from "lucide-react";
 
 // Dynamic Map
@@ -31,13 +29,17 @@ export default function FamousSpotDetails() {
   const [spot, setSpot] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch Data
+  // slideshow index
+  const [currentImage, setCurrentImage] = useState(0);
+
+  // ============ Fetch Spot ============ //
   useEffect(() => {
     const fetchSpot = async () => {
       try {
         const endpoint = isHidden
           ? `/hidden-spots/${id}`
           : `/famous-spots/${id}`;
+
         const res = await api.get(endpoint);
         setSpot(res.data.data);
       } catch (err) {
@@ -50,6 +52,19 @@ export default function FamousSpotDetails() {
     fetchSpot();
     window.scrollTo(0, 0);
   }, [id, isHidden]);
+
+  // ============ Slideshow (City Landing style) ============ //
+  useEffect(() => {
+    const images = spot?.images;
+
+    if (!images || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [spot?.images?.length]);
 
   if (loading) {
     return (
@@ -72,7 +87,6 @@ export default function FamousSpotDetails() {
   const dbLat = hasCoords ? spot.geometry.coordinates[1] : null;
   const dbLng = hasCoords ? spot.geometry.coordinates[0] : null;
 
-  // Maps URL
   const googleMapsUrl = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&destination=${dbLat},${dbLng}`
     : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
@@ -80,11 +94,29 @@ export default function FamousSpotDetails() {
       )}`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF7ED] via-[#FFF3D6] to-[#FFFBEA]">
-
+    <div className="relative  overflow-hidden">
       {/* ============= HERO ============= */}
       <div className="relative h-[55vh] sm:h-[65vh] lg:h-[75vh] w-full overflow-hidden">
-        
+
+        {/* Slideshow */}
+        <div className="absolute inset-0">
+  {spot.images.map((img, index) => (
+    <motion.div
+      key={img}
+      className="absolute inset-0 bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        imageRendering: "auto",
+      }}
+      animate={{ opacity: index === currentImage ? 1 : 0 }}
+      transition={{ duration: 1.2 }}
+    />
+  ))}
+</div>
+
+        {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -94,16 +126,10 @@ export default function FamousSpotDetails() {
           <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-amber-800" />
         </motion.button>
 
-
-
-        <img
-          src={spot.images?.[0] || "/placeholder-image.jpg"}
-          alt={spot.spotName}
-          className="w-full h-full object-cover"
-        />
-
+        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-amber-900/70 via-amber-600/30 to-transparent" />
 
+        {/* Bottom text */}
         <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 md:p-16 text-white">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -127,7 +153,9 @@ export default function FamousSpotDetails() {
 
               <div className="flex items-center gap-1 bg-white/20 px-3 py-1 rounded-lg">
                 <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
-                <span>{spot.rating > 0 ? spot.rating.toFixed(1) : "New"}</span>
+                <span>
+                  {spot.rating > 0 ? spot.rating.toFixed(1) : "New"}
+                </span>
                 <span className="text-xs opacity-75">
                   ({spot.totalRatings} reviews)
                 </span>
@@ -138,7 +166,7 @@ export default function FamousSpotDetails() {
       </div>
 
       {/* ============= CONTENT ============= */}
-      <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-16 ">
+      <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
 
           {/* LEFT COLUMN */}
@@ -201,87 +229,77 @@ export default function FamousSpotDetails() {
 
             {/* CONTRIBUTIONS */}
             {spot.contributions?.length > 0 && (
-  <section className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-lg border border-amber-100">
-    <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-amber-900 mb-6 relative inline-block">
-      Visitor Contributions
-      <div className="absolute -bottom-1 left-0 w-24 h-[2px] bg-amber-400 rounded-full" />
-    </h2>
+              <section className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-lg border border-amber-100">
 
-    <div className="space-y-6 sm:space-y-8">
-      {spot.contributions.map((c) => (
-        <div
-          key={c._id}
-          className="border border-amber-100 rounded-xl p-4 sm:p-6 shadow-sm bg-amber-50/50"
-        >
-          {/* USER HEADER */}
-          <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-amber-900 mb-6 relative inline-block">
+                  Visitor Contributions
+                  <div className="absolute -bottom-1 left-0 w-24 h-[2px] bg-amber-400 rounded-full" />
+                </h2>
 
-            {/* ==== AVATAR FIXED HERE ==== */}
-            <Avatar className="w-10 h-10 sm:w-12 sm:h-12 border border-amber-200 shadow-sm">
-              <AvatarImage src={c.userId?.image} alt={c.userId?.username} />
+                <div className="space-y-6 sm:space-y-8">
+                  {spot.contributions.map((c) => (
+                    <div
+                      key={c._id}
+                      className="border border-amber-100 rounded-xl p-4 sm:p-6 shadow-sm bg-amber-50/50"
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar className="w-10 h-10 sm:w-12 sm:h-12 border border-amber-200 shadow-sm">
+                          <AvatarImage src={c.userId?.image} />
+                          <AvatarFallback className="bg-amber-500 text-white font-semibold">
+                            {c.userId?.username?.[0]?.toUpperCase() || "A"}
+                          </AvatarFallback>
+                        </Avatar>
 
-              <AvatarFallback className="bg-gradient-to-br from-amber-400 to-orange-500 text-white font-semibold">
-                {c.userId?.username
-                  ? c.userId.username.charAt(0).toUpperCase()
-                  : "A"}
-              </AvatarFallback>
-            </Avatar>
+                        <div>
+                          <p className="font-semibold text-amber-900">
+                            {c.userId?.username || "Anonymous user"}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            {new Date(c.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
 
-            <div>
-              <p className="font-semibold text-amber-900 text-sm sm:text-base">
-                {c.userId?.username || "Anonymous user"}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-600">
-                {new Date(c.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
+                      <p className="text-gray-700 whitespace-pre-line mb-3">
+                        {c.content}
+                      </p>
 
-          {/* CONTENT */}
-          <p className="text-gray-700 whitespace-pre-line text-sm sm:text-base mb-3">
-            {c.content}
-          </p>
+                      {c.images?.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                          {c.images.map((img, index) => (
+                            <img
+                              key={index}
+                              src={img}
+                              className="rounded-xl shadow-md h-32 sm:h-40 w-full object-cover"
+                            />
+                          ))}
+                        </div>
+                      )}
 
-          {/* IMAGES */}
-          {c.images?.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-              {c.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  className="rounded-xl shadow-md h-32 sm:h-40 w-full object-cover"
-                />
-              ))}
-            </div>
-          )}
+                      {c.videoLink && (
+                        <a
+                          href={c.videoLink}
+                          className="block text-red-600 mt-3 text-sm hover:underline"
+                          target="_blank"
+                        >
+                          🎬 Watch Video
+                        </a>
+                      )}
 
-          {/* VIDEO LINK */}
-          {c.videoLink && (
-            <a
-              href={c.videoLink}
-              className="inline-flex items-center gap-1 text-red-600 mt-3 text-sm hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🎬 Watch Video
-            </a>
-          )}
-
-          {/* INSTAGRAM LINK */}
-          {c.instagramLink && (
-            <a
-              href={c.instagramLink}
-              className="block mt-2 text-pink-600 text-sm hover:underline"
-              target="_blank"
-            >
-              📸 View on Instagram
-            </a>
-          )}
-        </div>
-      ))}
-    </div>
-  </section>
-)}
+                      {c.instagramLink && (
+                        <a
+                          href={c.instagramLink}
+                          className="block mt-2 text-pink-600 text-sm hover:underline"
+                          target="_blank"
+                        >
+                          📸 View on Instagram
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
           </motion.div>
 
@@ -292,7 +310,6 @@ export default function FamousSpotDetails() {
             transition={{ duration: 0.7 }}
             className="lg:sticky lg:top-24 space-y-6 sm:space-y-8 h-fit"
           >
-            {/* ESSENTIALS */}
             <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-lg border border-amber-200">
               <h3 className="text-2xl font-serif font-semibold text-amber-900 mb-4 sm:mb-6">
                 Visitor Essentials
@@ -305,7 +322,6 @@ export default function FamousSpotDetails() {
               </div>
             </div>
 
-            {/* LOCATION */}
             <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-6 sm:p-10 rounded-2xl sm:rounded-[2.5rem] text-white shadow-lg">
               <h3 className="text-xl sm:text-2xl font-serif font-semibold mb-3 sm:mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 sm:w-6 sm:h-6" /> Location
@@ -341,7 +357,9 @@ function InfoItem({ icon, title, value }) {
       </div>
 
       <div>
-        <h4 className="font-semibold text-amber-900 text-sm sm:text-base">{title}</h4>
+        <h4 className="font-semibold text-amber-900 text-sm sm:text-base">
+          {title}
+        </h4>
         <p className="text-gray-700 font-medium whitespace-pre-line text-sm sm:text-base">
           {value || "Not specified"}
         </p>

@@ -27,6 +27,7 @@ export default function HistoryDetails() {
   const navigate = useNavigate();
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
+   const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -43,6 +44,18 @@ export default function HistoryDetails() {
     fetchHistory();
     window.scrollTo(0, 0);
   }, [id]);
+
+    useEffect(() => {
+    const images = history?.images;
+
+    if (!images || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [history?.images?.length]);
 
   if (loading) {
     return (
@@ -75,6 +88,23 @@ export default function HistoryDetails() {
 
       {/* ================= HERO ================= */}
       <div className="relative h-[55vh] sm:h-[65vh] lg:h-[75vh] overflow-hidden">
+
+                <div className="absolute inset-0">
+  {history.images.map((img, index) => (
+    <motion.div
+      key={img}
+      className="absolute inset-0 bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        imageRendering: "auto",
+      }}
+      animate={{ opacity: index === currentImage ? 1 : 0 }}
+      transition={{ duration: 1.2 }}
+    />
+  ))}
+</div>
 
         <motion.button
           initial={{ opacity: 0, x: -20 }}

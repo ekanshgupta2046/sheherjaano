@@ -45,12 +45,7 @@ export default function Contribute() {
       desc: "Share unique crafts, artisans, and handmade treasures.",
       link: "/contribute/handicrafts",
     },
-    {
-      name: "Your Info",
-      icon: <User className="w-8 h-8 text-amber-700" />,
-      desc: "Give your info so tourists who love your city can reach you.",
-      link: "/contribute/your-info",
-    },
+
   ];
 
   return (
