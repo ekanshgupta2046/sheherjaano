@@ -22,7 +22,7 @@ export default function FeaturedCities() {
   const cities = [
     { name: "Mumbai", state: "Maharashtra", spots: "1,247", image: "/mumbai.jpg" },
     { name: "New Delhi", state: "Delhi", spots: "892", image: "/delhi.jpg" },
-    { name: "Bangalore", state: "Karnataka", spots: "634", image: "/bangalore.jpg" },
+    { name: "Jaipur", state: "Rajasthan", spots: "634", image: "/jaipur.jpg" },
     { name: "Kolkata", state: "West Bengal", spots: "578", image: "/kolkata.jpg" },
   ];
 
